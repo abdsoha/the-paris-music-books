@@ -5,7 +5,7 @@ pipeline {
         choice(
             name: 'ENV',
             choices: ['dev', 'qa', 'prod'],
-            description: 'Choose environment'
+            description: 'Select the environment'
         )
     }
 
@@ -17,14 +17,15 @@ pipeline {
 
         stage('Checkout') {
             steps {
-                echo 'Checking out source code'
+                echo 'Checking out source code from Git'
                 checkout scm
             }
         }
 
         stage('Build') {
             steps {
-                echo "Building ${env.APP_NAME} for ${params.ENV}"
+                echo "Building application: ${env.APP_NAME}"
+                echo "Target environment: ${params.ENV}"
                 sh 'ls -la'
             }
         }
@@ -32,7 +33,7 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running tests'
-                sh 'echo Tests passed'
+                sh 'echo Tests executed successfully'
             }
         }
 
@@ -45,10 +46,10 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline SUCCESS'
+            echo 'PIPELINE COMPLETED SUCCESSFULLY'
         }
         failure {
-            echo 'Pipeline FAILED'
+            echo 'PIPELINE FAILED'
         }
     }
 }
