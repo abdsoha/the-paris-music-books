@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout(true)
+    }
+
     parameters {
         choice(
             name: 'ENV',
@@ -11,7 +15,7 @@ pipeline {
 
     environment {
         SONAR_HOST_URL = 'http://136.113.252.182:9000'
-        SONAR_TOKEN = credentials('sonar-token')
+        SONAR_TOKEN = credentials('sqp_ee265b28ffd5099dbd660d0901673a843822ed71')
     }
 
     stages {
