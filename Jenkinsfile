@@ -24,18 +24,22 @@ pipeline {
 
         stage('Build with Maven') {
             steps {
-                sh 'mvn clean package'
+                dir('paris-music-app') {
+                    sh 'mvn clean package'
+                }
             }
         }
 
         stage('SonarQube Code Analysis') {
             steps {
-                sh """
-                mvn sonar:sonar \
-                -Dsonar.projectKey=paris-music-app \
-                -Dsonar.host.url=$SONAR_HOST_URL \
-                -Dsonar.login=$SONAR_TOKEN
-                """
+                dir('paris-music-app') {
+                    sh """
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=paris-music-app \
+                    -Dsonar.host.url=$SONAR_HOST_URL \
+                    -Dsonar.login=$SONAR_TOKEN
+                    """
+                }
             }
         }
     }
