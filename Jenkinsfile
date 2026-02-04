@@ -5,51 +5,47 @@ pipeline {
         choice(
             name: 'ENV',
             choices: ['dev', 'qa', 'prod'],
-            description: 'Select the environment'
+            description: 'Select environment'
         )
     }
 
     environment {
-        APP_NAME = 'the-paris-music'
+        SONAR_HOST_URL = 'http://http://136.113.252.182:9000'
+        SONAR_TOKEN = credentials('sonar-token')
     }
 
     stages {
 
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
-                echo 'Checking out source code from Git'
-                checkout scm
+                git branch: 'main', url: 'https://github.com/abdsoha/the-paris-music-books.git'
             }
         }
 
-        stage('Build') {
+        stage('Build with Maven') {
             steps {
-                echo "Building application: ${env.APP_NAME}"
-                echo "Target environment: ${params.ENV}"
-                sh 'ls -la'
+                sh 'mvn clean package'
             }
         }
 
-        stage('Test') {
+        stage('SonarQube Code Analysis') {
             steps {
-                echo 'Running tests'
-                sh 'echo Tests executed successfully'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo "Deploying ${env.APP_NAME} to ${params.ENV}"
+                sh """
+                mvn sonar:sonar \
+                -Dsonar.projectKey=paris-music-app \
+                -Dsonar.host.url=$SONAR_HOST_URL \
+                -Dsonar.login=$SONAR_TOKEN
+                """
             }
         }
     }
 
     post {
         success {
-            echo 'PIPELINE COMPLETED SUCCESSFULLY'
+            echo 'Pipeline completed successfully with SonarQube analysis'
         }
         failure {
-            echo 'PIPELINE FAILED'
+            echo 'Pipeline failed'
         }
     }
 }
