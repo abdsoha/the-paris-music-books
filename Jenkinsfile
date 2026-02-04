@@ -15,7 +15,6 @@ pipeline {
 
     environment {
         SONAR_HOST_URL = 'http://136.113.252.182:9000'
-        SONAR_TOKEN = credentials('sqp_ee265b28ffd5099dbd660d0901673a843822ed71')
     }
 
     stages {
@@ -37,12 +36,14 @@ pipeline {
         stage('SonarQube Code Analysis') {
             steps {
                 dir('paris-music-app') {
-                    sh """
-                    mvn sonar:sonar \
-                    -Dsonar.projectKey=paris-music-app \
-                    -Dsonar.host.url=$SONAR_HOST_URL \
-                    -Dsonar.login=$SONAR_TOKEN
-                    """
+                    withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                        sh """
+                        mvn sonar:sonar \
+                        -Dsonar.projectKey=paris-music-app \
+                        -Dsonar.host.url=$SONAR_HOST_URL \
+                        -Dsonar.login=$SONAR_TOKEN
+                        """
+                    }
                 }
             }
         }
