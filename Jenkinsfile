@@ -1,34 +1,30 @@
 pipeline {
     agent any
 
-    options {
-        skipDefaultCheckout(true)
-    }
-
     stages {
-
         stage('Checkout Code') {
             steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/abdsoha/the-paris-music-books.git'
-                    ]]
-                ])
+                checkout scm
+            }
+        }
+
+        stage('Verify Structure') {
+            steps {
+                sh '''
+                echo "Workspace root:"
+                pwd
+                ls -l
+
+                echo "Checking paris-music-app:"
+                ls -l paris-music-app
+                '''
             }
         }
 
         stage('Build with Maven') {
             steps {
                 dir('paris-music-app') {
-                    sh '''
-                        echo "Current directory:"
-                        pwd
-                        echo "Listing files:"
-                        ls -l
-                        mvn clean package
-                    '''
+                    sh 'mvn clean package'
                 }
             }
         }
