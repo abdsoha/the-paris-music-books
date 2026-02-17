@@ -1,41 +1,40 @@
 pipeline {
     agent any
 
+    tools {
+        maven 'Maven3'
+    }
+
     stages {
-        stage('Checkout Code') {
+
+        stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main',
+                    credentialsId: 'github-creds',
+                    url: 'https://github.com/<your-username>/<your-repo>.git'
             }
         }
 
-        stage('Verify Structure') {
+        stage('Build') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Docker Build') {
+            steps {
+                sh 'docker build -t paris-music-app .'
+            }
+        }
+
+        stage('Docker Run') {
             steps {
                 sh '''
-                echo "Workspace root:"
-                pwd
-                ls -l
-
-                echo "Checking paris-music-app:"
-                ls -l paris-music-app
+                docker rm -f paris-music || true
+                docker run -d -p 9090:8080 --name paris-music paris-music-app
                 '''
             }
         }
 
-        stage('Build with Maven') {
-            steps {
-                dir('paris-music-app') {
-                    sh 'mvn clean package'
-                }
-            }
-        }
-    }
-
-    post {
-        success {
-            echo '✅ BUILD SUCCESSFUL'
-        }
-        failure {
-            echo '❌ BUILD FAILED'
-        }
     }
 }
