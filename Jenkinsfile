@@ -7,11 +7,10 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
+        stage('Checkout') stage('Checkout') {
             steps {
-                git branch: 'main',
-                    credentialsId: 'github-creds',
-                    url: 'https://github.com/abdsoha/the-paris-music-books.git'
+                // Senior Practice: Don't hardcode URLs; inherit from the Job configuration
+                checkout scm 
             }
         }
 
