@@ -2,29 +2,31 @@ pipeline {
     agent any
 
     tools {
-        // Must match the name you configured in Manage Jenkins > Tools
         maven 'Maven3'
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Inherits the Git URL and credentials from your Jenkins Job settings
                 checkout scm 
             }
         }
 
         stage('Build') {
             steps {
-                sh 'mvn clean package -DskipTests'
+                // Senior Practice: Use 'dir' to change into the project subdirectory
+                dir('paris-music-app') {
+                    sh 'mvn clean package -DskipTests'
+                }
             }
         }
 
         stage('Docker Build') {
             steps {
-                // Uses the unique build number for senior-level version control
-                sh "docker build -t paris-music-app:${env.BUILD_NUMBER} ."
-                sh "docker tag paris-music-app:${env.BUILD_NUMBER} paris-music-app:latest"
+                dir('paris-music-app') {
+                    sh "docker build -t paris-music-app:${env.BUILD_NUMBER} ."
+                    sh "docker tag paris-music-app:${env.BUILD_NUMBER} paris-music-app:latest"
+                }
             }
         }
 
