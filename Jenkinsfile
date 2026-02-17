@@ -35,7 +35,8 @@ pipeline {
                 sh '''
                 docker stop paris-music || true
                 docker rm paris-music || true
-                docker run -d -p 9090:8080 --name paris-music paris-music-app:latest
+                # Mapping Host 9090 to Container 9090 as per your app config
+                docker run -d -p 9090:9090 --name paris-music paris-music-app:latest
                 '''
             }
         }
